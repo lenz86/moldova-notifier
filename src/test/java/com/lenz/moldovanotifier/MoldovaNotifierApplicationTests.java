@@ -1,0 +1,13 @@
+package com.lenz.moldovanotifier;
+
+import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.SpringBootTest;
+
+@SpringBootTest
+class MoldovaNotifierApplicationTests {
+
+    @Test
+    void contextLoads() {
+    }
+
+}

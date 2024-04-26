@@ -1,7 +1,4 @@
-/moldova-notifier/target/
 !.mvn/wrapper/maven-wrapper.jar
-!**/src/main/**/target/
-!**/src/test/**/target/
 
 ### STS ###
 .apt_generated
@@ -11,6 +8,7 @@
 .settings
 .springBeans
 .sts4-cache
+/target/**
 
 ### IntelliJ IDEA ###
 .idea

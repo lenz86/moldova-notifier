@@ -22,22 +22,26 @@ public class EmbassyBookingService {
   public static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
 
   private @Value("${Embassy.BaseUrl}") String BASE_URL;
-  private @Value("${Embassy.CheckingPeriodInMonth}") int CHECKING_PERIOD_IN_MONTH;
-  private @Value("${Embassy.IgnoreBooking}") byte IGNORE_BOOKING;
+  private @Value("${Embassy.CheckingPeriodInMonth}") int                     CHECKING_PERIOD_IN_MONTH;
+  private @Value("${Embassy.IgnoreBooking}") byte                    IGNORE_BOOKING;
 
-  private @Value("${Embassy.EmbassyApiId}") String EMBASSY_API_ID;
-  private @Value("${Embassy.CitizenshipResourceId}") String CITIZENSHIP_RESOURCE_ID;
-  private @Value("${Embassy.CitizenshipServiceId}") String CITIZENSHIP_SERVICE_ID;
-  private @Value("${Embassy.NotaryResourceId}") String NOTARY_RESOURCE_ID;
-  private @Value("${Embassy.NotaryServiceId}") String NOTARY_SERVICE_ID;
+  private @Value("${Embassy.EmbassyApiId}")             String EMBASSY_API_ID;
+  private @Value("${Embassy.CitizenshipResourceId}")    String CITIZENSHIP_RESOURCE_ID;
+  private @Value("${Embassy.CitizenshipServiceId}")     String CITIZENSHIP_SERVICE_ID;
+  private @Value("${Embassy.NotaryResourceId}")         String NOTARY_RESOURCE_ID;
+  private @Value("${Embassy.NotaryServiceId}")          String NOTARY_SERVICE_ID;
   private @Value("${Embassy.ReregistrationResourceId}") String REREGISTRATION_RESOURCE_ID;
-  private @Value("${Embassy.ReregistrationServiceId}") String REREGISTRATION_SERVICE_ID;
+  private @Value("${Embassy.ReregistrationServiceId}")  String REREGISTRATION_SERVICE_ID;
+  private @Value("${Embassy.PassportResourceId}")       String PASSPORT_RESOURCE_ID;
+  private @Value("${Embassy.PassportServiceId}")        String PASSPORT_SERVICE_ID;
+
 
 
   public void checkAllServices() {
     checkReRegistrationAvailableDates();
     checkCitizenshipAvailableDates();
     checkNotaryAvailableDates();
+    checkPassportAvailableDates();
   }
 
   public void checkCitizenshipAvailableDates() {
@@ -66,7 +70,6 @@ public class EmbassyBookingService {
     }
   }
 
-
   public void checkReRegistrationAvailableDates() {
     String reRegistrationUrl = buildUrl(REREGISTRATION_RESOURCE_ID, REREGISTRATION_SERVICE_ID);
     ResponseEntity<BookingResponse> response = integrationManager.callApi(reRegistrationUrl, EmbassyServiceType.REREGISTRATION, BookingResponse.class);
@@ -77,6 +80,19 @@ public class EmbassyBookingService {
     } else {
       log.warn("There are available booking periods for service: {}. Total available: {}.",
         EmbassyServiceType.REREGISTRATION, availablePeriods.size());
+    }
+  }
+
+  public void checkPassportAvailableDates() {
+    String reRegistrationUrl = buildUrl(PASSPORT_RESOURCE_ID, PASSPORT_SERVICE_ID);
+    ResponseEntity<BookingResponse> response = integrationManager.callApi(reRegistrationUrl, EmbassyServiceType.PASSPORT, BookingResponse.class);
+    List<BookingData> availablePeriods = filterAvailablePeriods(response);
+    if (availablePeriods.isEmpty()) {
+      log.info("There are no available periods for service: {}.",
+        EmbassyServiceType.PASSPORT);
+    } else {
+      log.warn("There are available booking periods for service: {}. Total available: {}.",
+        EmbassyServiceType.PASSPORT, availablePeriods.size());
     }
   }
 

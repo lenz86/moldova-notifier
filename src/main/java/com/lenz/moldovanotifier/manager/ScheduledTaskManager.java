@@ -4,6 +4,7 @@ import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -20,6 +21,7 @@ public class ScheduledTaskManager {
   private final String threadNamePrefix = ScheduledTaskManager.class.getSimpleName();
   private final Object stopSignal = new Object();
   private AtomicBoolean shutdownFlag = new AtomicBoolean();
+  private @Value(("${ReservioApi.CallMsDelay}")) Integer CALL_API_DELAY;
 
   @PostConstruct
   public void init() {
@@ -54,6 +56,6 @@ public class ScheduledTaskManager {
           log.error("An error has occurred while do scheduled job. Error: {}", ex.toString());
         }
       },
-      1, 10, TimeUnit.SECONDS);
+      1, CALL_API_DELAY, TimeUnit.MILLISECONDS);
   }
 }

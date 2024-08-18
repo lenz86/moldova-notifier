@@ -57,6 +57,7 @@
 	</dependencies>
 
 	<build>
+		<finalName>moldova-notifier</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>

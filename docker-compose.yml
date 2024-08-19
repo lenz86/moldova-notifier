@@ -1,0 +1,14 @@
+name: "moldova-notifier"
+
+services:
+  moldova-notifier-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    env_file:
+      - docker/container.env
+    environment:
+      - TG_BOT_NAME=${TG_BOT_NAME}
+      - TG_BOT_TOKEN=${TG_BOT_TOKEN}

@@ -39,27 +39,3 @@ There are 3 different profiles for building the project:
 * All parameters in ./config/remote-deployment-properties must be defined
 * If you build app on Windows, you must set correct access rights for you private key file 
 to prevent error when run remote .sh via openssh (default for Windows)
-
-### Переменные окружения для запуска проекта
-
-* ICE_HOME - путь где /bin лежит slice2java (нужен если slice2java нет на PATH)
-* ICE_SLICE - путь где лежат .slice файлы
-
-### Сборка под MacOS
-
-Установка [ZeroC Ice](https://formulae.brew.sh/formula/ice):
-
-```bash
-brew install ice
-```
-
-Установка [protobuf](https://formulae.brew.sh/formula/protobuf):
-
-```bash
-brew install protobuf
-```
-
-
-## Известные проблемы
-
-* NGINX не поддерживает нормально Sticky Sessions, поэтому нет репликации, т.е. он может быть только один!

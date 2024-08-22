@@ -1,0 +1,16 @@
+com\lenz\moldovanotifier\model\BaseResponse.class
+com\lenz\moldovanotifier\manager\ScheduledTaskManager.class
+com\lenz\moldovanotifier\manager\TelegramBotManager.class
+com\lenz\moldovanotifier\model\booking\Links.class
+com\lenz\moldovanotifier\config\TelegramBotConfig.class
+com\lenz\moldovanotifier\model\EmbassyServiceType.class
+com\lenz\moldovanotifier\model\bot\BotCommandType.class
+com\lenz\moldovanotifier\model\booking\Meta.class
+com\lenz\moldovanotifier\manager\EmbassyBookingService.class
+com\lenz\moldovanotifier\model\booking\Attributes.class
+com\lenz\moldovanotifier\manager\ReservioIntegrationManager.class
+com\lenz\moldovanotifier\model\booking\BookingData.class
+com\lenz\moldovanotifier\RunApplication.class
+com\lenz\moldovanotifier\manager\TelegramBotManager$1.class
+com\lenz\moldovanotifier\config\BotInitializer.class
+com\lenz\moldovanotifier\model\booking\BookingResponse.class

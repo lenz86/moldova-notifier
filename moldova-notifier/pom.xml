@@ -1,0 +1,281 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<!-- Refer to the parent project -->
+	<parent>
+		<groupId>com.lenz</groupId>
+		<artifactId>moldova-notifier-parent</artifactId>
+		<version>${revision}</version>
+		<relativePath>../pom.xml</relativePath>
+	</parent>
+
+	<artifactId>moldova-notifier</artifactId>
+	<packaging>jar</packaging>
+
+	<name>moldova-notifier</name>
+	<description>Embassy booking notifier</description>
+
+	<dependencies>
+		<!-- Spring Boot -->
+		<!-- ====================================================== -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-devtools</artifactId>
+			<scope>runtime</scope>
+			<optional>true</optional>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<!-- ====================================================== -->
+
+		<!-- Jackson -->
+		<!-- ====================================================== -->
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+		</dependency>
+		<!-- ====================================================== -->
+
+		<!-- Lombok -->
+		<!-- ====================================================== -->
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+		</dependency>
+		<!-- ====================================================== -->
+
+		<!-- Telegram Bot -->
+		<!-- ====================================================== -->
+		<dependency>
+			<groupId>org.telegram</groupId>
+			<artifactId>telegrambots</artifactId>
+			<version>6.5.0</version>
+		</dependency>
+		<!-- ====================================================== -->
+
+	</dependencies>
+
+	<!-- Build default -->
+	<build>
+		<finalName>moldova-notifier</finalName>
+		<extensions>
+			<extension>
+				<groupId>org.apache.maven.wagon</groupId>
+				<artifactId>wagon-ssh</artifactId>
+				<version>3.5.3</version>
+			</extension>
+		</extensions>
+
+		<plugins>
+
+			<!-- Copy resources for deploying to the remote\local server -->
+			<!-- ====================================================== -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-resources-plugin</artifactId>
+				<version>3.3.1</version>
+				<executions>
+					<execution>
+						<id>prepare-to-deployment</id>
+						<phase>install</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>target/moldova-notifier-app</outputDirectory>
+							<resources>
+								<resource>
+									<directory>.</directory>
+									<includes>
+										<include>target/moldova-notifier.jar</include>
+										<include>config/application.properties</include>
+										<include>docker/container.env</include>
+										<include>docker/entrypoint.sh</include>
+										<include>Dockerfile</include>
+										<include>docker-compose.yml</include>
+									</includes>
+								</resource>
+								<resource>
+									<directory>config</directory>
+									<includes>
+										<include>run-application-remote.sh</include>
+									</includes>
+								</resource>
+							</resources>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<!-- ====================================================== -->
+
+			<!-- Disable default maven-deploy step -->
+			<!-- ====================================================== -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-deploy-plugin</artifactId>
+				<version>3.1.1</version>
+				<executions>
+					<execution>
+						<id>default-deploy</id>
+						<phase>deploy</phase>
+						<goals>
+							<goal>deploy</goal>
+						</goals>
+						<configuration>
+							<skip>true</skip>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<!-- ====================================================== -->
+
+		</plugins>
+	</build>
+
+	<!-- Profiles -->
+	<profiles>
+		<!-- Profile for running a project locally without deployment to Docker -->
+		<profile>
+			<id>debug</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+		</profile>
+		<!-- ====================================================== -->
+
+		<!-- Profile for running a project locally inside Docker -->
+		<profile>
+			<id>development</id>
+			<properties>
+				<environment>development</environment>
+			</properties>
+			<build>
+				<plugins>
+					<!-- Run application locally -->
+					<!-- ====================================================== -->
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>exec-maven-plugin</artifactId>
+						<version>${exec.maven.plugin.version}</version>
+						<executions>
+							<execution>
+								<phase>deploy</phase>
+								<goals>
+									<goal>exec</goal>
+								</goals>
+							</execution>
+						</executions>
+						<configuration>
+							<executable>bash</executable> <!-- bash.exe must be on PATH -->
+							<workingDirectory>../</workingDirectory>
+							<arguments>
+								<argument>config/run-application-local.sh</argument>
+							</arguments>
+						</configuration>
+					</plugin>
+					<!-- ====================================================== -->
+				</plugins>
+			</build>
+		</profile>
+		<!-- ====================================================== -->
+
+		<!-- Profile for running a project on a remote server inside Docker -->
+		<profile>
+			<id>production</id>
+			<properties>
+				<environment>production</environment>
+			</properties>
+			<build>
+				<plugins>
+					<!-- Get prod server credentials from remote-deployment.properties -->
+					<!-- ====================================================== -->
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>properties-maven-plugin</artifactId>
+						<version>1.2.1</version>
+						<executions>
+							<execution>
+								<phase>deploy</phase>
+								<goals>
+									<goal>read-project-properties</goal>
+								</goals>
+								<configuration>
+									<files>
+										<file>../config/remote-deployment.properties</file>
+									</files>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+					<!-- ====================================================== -->
+
+					<!-- Deploy application to remote server via ssh (scp) -->
+					<!-- Server config for serverId must be configured in maven settings.xml -->
+					<!-- Server credentials/private key path must be defined in /config/remote-deployment.properties -->
+					<!-- ====================================================== -->
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>wagon-maven-plugin</artifactId>
+						<version>2.0.2</version>
+						<executions>
+							<execution>
+								<id>deploy-to-production</id>
+								<phase>deploy</phase>
+								<goals>
+									<goal>upload</goal>
+								</goals>
+								<configuration>
+									<serverId>firstbyte-public</serverId>
+									<fromDir>target/moldova-notifier-app</fromDir>
+									<url>scp://${production.address}</url>
+									<toDir>${production.app.dir}</toDir>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+					<!-- ====================================================== -->
+
+					<!-- Run application on remote server -->
+					<!-- ====================================================== -->
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>exec-maven-plugin</artifactId>
+						<version>${exec.maven.plugin.version}</version>
+						<executions>
+							<execution>
+								<phase>deploy</phase>
+								<goals>
+									<goal>exec</goal>
+								</goals>
+							</execution>
+						</executions>
+						<configuration>
+							<executable>ssh</executable>
+							<arguments>
+								<argument>-i</argument>
+								<argument>${production.key.path}</argument>
+								<argument>${production.user}@${production.address}</argument>
+								<argument>'sudo' ${production.app.dir}/run-application-remote.sh</argument>
+								<argument>${production.app.dir}</argument>
+							</arguments>
+						</configuration>
+					</plugin>
+					<!-- ====================================================== -->
+				</plugins>
+			</build>
+		</profile>
+		<!-- ====================================================== -->
+	</profiles>
+
+</project>

@@ -39,6 +39,14 @@
 		</dependency>
 		<!-- ====================================================== -->
 
+		<!-- Spring Actuator (Healthcheck) -->
+		<!-- ====================================================== -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-actuator</artifactId>
+		</dependency>
+		<!-- ====================================================== -->
+
 		<!-- Jackson -->
 		<!-- ====================================================== -->
 		<dependency>
@@ -79,6 +87,22 @@
 
 		<plugins>
 
+			<!-- SpringBoot maven plugin -->
+			<!-- ====================================================== -->
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+				<configuration>
+					<excludes>
+						<exclude>
+							<groupId>org.projectlombok</groupId>
+							<artifactId>lombok</artifactId>
+						</exclude>
+					</excludes>
+				</configuration>
+			</plugin>
+			<!-- ====================================================== -->
+
 			<!-- Copy resources for deploying to the remote\local server -->
 			<!-- ====================================================== -->
 			<plugin>
@@ -96,18 +120,18 @@
 							<outputDirectory>target/moldova-notifier-app</outputDirectory>
 							<resources>
 								<resource>
-									<directory>.</directory>
+									<directory>..</directory>
 									<includes>
-										<include>target/moldova-notifier.jar</include>
-										<include>config/application.properties</include>
-										<include>docker/container.env</include>
-										<include>docker/entrypoint.sh</include>
-										<include>Dockerfile</include>
-										<include>docker-compose.yml</include>
+										<include>/moldova-notifier/target/moldova-notifier.jar</include>
+										<include>/config/application.properties</include>
+										<include>/docker/container.env</include>
+										<include>/docker/entrypoint.sh</include>
+										<include>/Dockerfile</include>
+										<include>/docker-compose.yml</include>
 									</includes>
 								</resource>
 								<resource>
-									<directory>config</directory>
+									<directory>../config</directory>
 									<includes>
 										<include>run-application-remote.sh</include>
 									</includes>

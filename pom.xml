@@ -41,7 +41,6 @@
     <build>
         <pluginManagement>
             <plugins>
-
                 <!-- SpringBoot maven plugin -->
                 <!-- ====================================================== -->
                 <plugin>
@@ -57,9 +56,11 @@
                     </executions>
                 </plugin>
                 <!-- ====================================================== -->
-
             </plugins>
         </pluginManagement>
     </build>
 
+    <modules>
+        <module>moldova-notifier</module>
+    </modules>
 </project>

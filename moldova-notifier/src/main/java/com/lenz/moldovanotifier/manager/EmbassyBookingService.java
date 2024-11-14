@@ -3,6 +3,7 @@ package com.lenz.moldovanotifier.manager;
 import com.lenz.moldovanotifier.model.EmbassyServiceType;
 import com.lenz.moldovanotifier.model.booking.BookingData;
 import com.lenz.moldovanotifier.model.booking.BookingResponse;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,6 +16,7 @@ import java.util.List;
 
 @Service
 @Slf4j
+@Getter
 public class EmbassyBookingService {
 
   private @Autowired ReservioIntegrationManager integrationManager;
@@ -22,19 +24,19 @@ public class EmbassyBookingService {
 
   public static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
 
-  private @Value("${Embassy.BaseUrl}") String BASE_URL;
-  private @Value("${Embassy.CheckingPeriodInMonth}") int                     CHECKING_PERIOD_IN_MONTH;
-  private @Value("${Embassy.IgnoreBooking}") byte                    IGNORE_BOOKING;
+  private @Value("${Embassy.BaseUrl}") String baseUrl;
+  private @Value("${Embassy.CheckingPeriodInMonth}") int checkingPeriodInMonth;
+  private @Value("${Embassy.IgnoreBooking}") byte ignoreBooking;
 
-  private @Value("${Embassy.EmbassyApiId}")             String EMBASSY_API_ID;
-  private @Value("${Embassy.CitizenshipResourceId}")    String CITIZENSHIP_RESOURCE_ID;
-  private @Value("${Embassy.CitizenshipServiceId}")     String CITIZENSHIP_SERVICE_ID;
-  private @Value("${Embassy.NotaryResourceId}")         String NOTARY_RESOURCE_ID;
-  private @Value("${Embassy.NotaryServiceId}")          String NOTARY_SERVICE_ID;
-  private @Value("${Embassy.ReregistrationResourceId}") String REREGISTRATION_RESOURCE_ID;
-  private @Value("${Embassy.ReregistrationServiceId}")  String REREGISTRATION_SERVICE_ID;
-  private @Value("${Embassy.PassportResourceId}")       String PASSPORT_RESOURCE_ID;
-  private @Value("${Embassy.PassportServiceId}")        String PASSPORT_SERVICE_ID;
+  private @Value("${Embassy.EmbassyApiId}")             String embassyApiId;
+  private @Value("${Embassy.CitizenshipResourceId}")    String citizenshipResourceId;
+  private @Value("${Embassy.CitizenshipServiceId}")     String citizenshipServiceId;
+  private @Value("${Embassy.NotaryResourceId}")         String notaryResourceId;
+  private @Value("${Embassy.NotaryServiceId}")          String notaryServiceId;
+  private @Value("${Embassy.ReregistrationResourceId}") String reregistrationResourceId;
+  private @Value("${Embassy.ReregistrationServiceId}")  String reregistrationServiceId;
+  private @Value("${Embassy.PassportResourceId}")       String passportResourceId;
+  private @Value("${Embassy.PassportServiceId}")        String passportServiceId;
 
 
 
@@ -46,14 +48,14 @@ public class EmbassyBookingService {
   }
 
   public void checkCitizenshipAvailableDates() {
-    String citizenshipUrl = builApiUrl(CITIZENSHIP_RESOURCE_ID, CITIZENSHIP_SERVICE_ID);
+    String citizenshipUrl = buildApiUrl(citizenshipResourceId, citizenshipServiceId);
     ResponseEntity<BookingResponse> response = integrationManager.callApi(citizenshipUrl, EmbassyServiceType.CITIZENSHIP, BookingResponse.class);
     List<BookingData> availablePeriods = filterAvailablePeriods(response);
     if (availablePeriods.isEmpty()) {
       log.info("There are no available periods for service: {}.", EmbassyServiceType.CITIZENSHIP);
     } else {
       log.warn("There are available booking periods for service: {}. Total available: {}.", EmbassyServiceType.CITIZENSHIP, availablePeriods.size());
-      String urlForBooking = buildBookingUrl(CITIZENSHIP_SERVICE_ID);
+      String urlForBooking = buildBookingUrl(citizenshipServiceId);
       String message = """
         There are available dates for service: %s. Link for booking: %s
         """.formatted(EmbassyServiceType.CITIZENSHIP, urlForBooking);
@@ -62,14 +64,14 @@ public class EmbassyBookingService {
   }
 
   public void checkNotaryAvailableDates() {
-    String notaryUrl = builApiUrl(NOTARY_RESOURCE_ID, NOTARY_SERVICE_ID);
+    String notaryUrl = buildApiUrl(notaryResourceId, notaryServiceId);
     ResponseEntity<BookingResponse> response = integrationManager.callApi(notaryUrl, EmbassyServiceType.NOTARY, BookingResponse.class);
     List<BookingData> availablePeriods = filterAvailablePeriods(response);
     if (availablePeriods.isEmpty()) {
       log.info("There are no available periods for service: {}.}", EmbassyServiceType.NOTARY);
     } else {
       log.warn("There are available booking periods for service: {}. Total available: {}.", EmbassyServiceType.NOTARY, availablePeriods.size());
-      String urlForBooking = buildBookingUrl(NOTARY_SERVICE_ID);
+      String urlForBooking = buildBookingUrl(notaryServiceId);
       String message = """
         There are available dates for service: %s. Link for booking: %s
         """.formatted(EmbassyServiceType.NOTARY, urlForBooking);
@@ -78,14 +80,14 @@ public class EmbassyBookingService {
   }
 
   public void checkReRegistrationAvailableDates() {
-    String reRegistrationUrl = builApiUrl(REREGISTRATION_RESOURCE_ID, REREGISTRATION_SERVICE_ID);
+    String reRegistrationUrl = buildApiUrl(reregistrationResourceId, reregistrationServiceId);
     ResponseEntity<BookingResponse> response = integrationManager.callApi(reRegistrationUrl, EmbassyServiceType.REREGISTRATION, BookingResponse.class);
     List<BookingData> availablePeriods = filterAvailablePeriods(response);
     if (availablePeriods.isEmpty()) {
       log.info("There are no available periods for service: {}.", EmbassyServiceType.REREGISTRATION);
     } else {
       log.warn("There are available booking periods for service: {}. Total available: {}.", EmbassyServiceType.REREGISTRATION, availablePeriods.size());
-      String urlForBooking = buildBookingUrl(REREGISTRATION_SERVICE_ID);
+      String urlForBooking = buildBookingUrl(reregistrationServiceId);
       String message = """
         There are available dates for service: %s. Link for booking: %s
         """.formatted(EmbassyServiceType.REREGISTRATION, urlForBooking);
@@ -94,14 +96,14 @@ public class EmbassyBookingService {
   }
 
   public void checkPassportAvailableDates() {
-    String reRegistrationUrl = builApiUrl(PASSPORT_RESOURCE_ID, PASSPORT_SERVICE_ID);
+    String reRegistrationUrl = buildApiUrl(passportResourceId, passportServiceId);
     ResponseEntity<BookingResponse> response = integrationManager.callApi(reRegistrationUrl, EmbassyServiceType.PASSPORT, BookingResponse.class);
     List<BookingData> availablePeriods = filterAvailablePeriods(response);
     if (availablePeriods.isEmpty()) {
       log.info("There are no available periods for service: {}.", EmbassyServiceType.PASSPORT);
     } else {
       log.warn("There are available booking periods for service: {}. Total available: {}.", EmbassyServiceType.PASSPORT, availablePeriods.size());
-      String urlForBooking = buildBookingUrl(PASSPORT_SERVICE_ID);
+      String urlForBooking = buildBookingUrl(passportServiceId);
       String message = """
         There are available dates for service: %s. Link for booking: %s
         """.formatted(EmbassyServiceType.PASSPORT, urlForBooking);
@@ -109,9 +111,9 @@ public class EmbassyBookingService {
     }
   }
 
-  private String builApiUrl(String resourceId, String serviceId) {
+  public String buildApiUrl(String resourceId, String serviceId) {
     LocalDateTime from = LocalDateTime.now();
-    LocalDateTime to = from.plusMonths(CHECKING_PERIOD_IN_MONTH);
+    LocalDateTime to = from.plusMonths(checkingPeriodInMonth);
     String filterFrom = buildFilterFrom(from);
     String filterTo = buildFilterTo(to);
     String apiPath = buildApiPath();
@@ -120,7 +122,7 @@ public class EmbassyBookingService {
     String filterIgnoreBooking = buildIgnoreBooking();
 
     StringBuilder builder = new StringBuilder();
-    return builder.append(BASE_URL)
+    return builder.append(baseUrl)
       .append(apiPath)
       .append(filterFrom)
       .append(filterResourceId)
@@ -133,7 +135,7 @@ public class EmbassyBookingService {
   private String buildBookingUrl(String serviceId) {
     String bookingPrefixPath = "/booking?step=1&";
     StringBuilder builder = new StringBuilder();
-    return builder.append(BASE_URL)
+    return builder.append(baseUrl)
       .append(bookingPrefixPath)
       .append("serviceId=")
       .append(serviceId)
@@ -141,7 +143,7 @@ public class EmbassyBookingService {
   }
 
   private String buildApiPath() {
-    return "/api/v2/businesses/" + EMBASSY_API_ID + "/availability/booking-days";
+    return "/api/v2/businesses/" + embassyApiId + "/availability/booking-days";
   }
 
   private String buildFilterFrom(LocalDateTime from) {
@@ -161,7 +163,7 @@ public class EmbassyBookingService {
   }
 
   private String buildIgnoreBooking() {
-    return "&ignoreBookingBoundaries=" + IGNORE_BOOKING;
+    return "&ignoreBookingBoundaries=" + ignoreBooking;
   }
 
   private List<BookingData> filterAvailablePeriods(ResponseEntity<BookingResponse> response) {

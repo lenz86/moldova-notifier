@@ -9,6 +9,7 @@
 .springBeans
 .sts4-cache
 /target/**
+moldova-notifier/target/**
 
 ### IntelliJ IDEA ###
 .idea
